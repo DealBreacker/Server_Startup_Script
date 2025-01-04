@@ -1,6 +1,7 @@
 import re, time
-from iNotify_Simple import INotify, flags
+from inotify_simple import INotify, flags
 from server_configs import monitoring, players_online, last_activity
+from logging_system import update_player_log
 
 
 def process_log_line(server_name, line, player_join_pattern, player_leave_pattern):
@@ -9,9 +10,11 @@ def process_log_line(server_name, line, player_join_pattern, player_leave_patter
     if join_match:
         player = join_match.group(1)
         players_online[server_name].add(player)
+        update_player_log(server_name, player, 'join')
     elif leave_match:
         player = leave_match.group(1)
         players_online[server_name].remove(player)
+        update_player_log(server_name, player, 'leave')
         if not players_online[server_name]:
             last_activity[server_name] = time.time()
 
