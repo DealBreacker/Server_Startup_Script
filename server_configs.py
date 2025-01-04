@@ -28,6 +28,13 @@ SERVER_CONFIGS = {
 	'startup_script': '/home/dealbreacker/servers/all_the_mods_9-TO_THE_SKY/',
 	'startup_program': './startserver.sh',
 	'log_file': '/home/dealbreacker/servers/all_the_mods_9-TO_THE_SKY/logs/latest.log'
+    },
+    'evolution': {
+        'host': '192.168.1.130',
+    'port': 25569,
+    'startup_script': '/home/dealbreacker/servers/evolution/',
+    'startup_program': './run.sh',
+    'log_file': '/home/dealbreacker/servers/evolution/logs/latest.log'
     }
 }
 #~~~~~~~~~~~~~~ This is the location for servers that are currently under maintinance/out of comission~~~~~~~~~
