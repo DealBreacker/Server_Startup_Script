@@ -6,23 +6,24 @@ from log_monitoring import follow_log
 socket_servers = {}
 
 def setup_server_sockets():
-    for server_name, config in SERVER_CONFIGS:
+    for server_name, config in SERVER_CONFIGS.items():
         host = config['host']
-        port = config['host']
+        port = config['port']  # Changed from 'host' to 'port'
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack('ii', 1, 0))
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        server_socket.bind((host,port))
+        server_socket.bind((host, port))
         server_socket.listen(5)
         server_socket.setblocking(0)
         socket_servers[server_name] = {
-            'startup_socket': server_socket,
+            'server_socket': server_socket,  # Changed from 'startup_socket' to 'server_socket'
             'startup_script': config['startup_script'],
             'startup_program': config['startup_program'],
             'log_file': config['log_file'],
             'running': False
         }
-        print(f"Listening for connections on {host}: {port} for {server_name}...")
+        print(f"Listening for connections on {host}:{port} for {server_name}...")
+
 
 def handle_connection_test(server_name, client_socket, addr):
     print(f"Connection from {addr} to {server_name}")
