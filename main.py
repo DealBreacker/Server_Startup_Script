@@ -10,7 +10,7 @@ from tmux_manager import kill_tmux_sessions
 from logging_system import initialize_log_files, log_connection, generate_daily_summary, save_state, load_state, rollover_server_logs, rollover_summary_logs
 from shutdown_manager import stop_signal, check_for_stop, stop_all_servers, close_all_threads, log_shutdown_event, input_listener
 
-DEBUG_MODE = 1  # Set to 1 for debugging (only print information), 0 for normal operation
+DEBUG_MODE = 0  # Set to 1 for debugging (only print information), 0 for normal operation
 
 def main():
     # Ensure log directories exist
