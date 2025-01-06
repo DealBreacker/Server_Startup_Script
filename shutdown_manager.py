@@ -20,7 +20,7 @@ def check_for_stop():
         user_input = input_queue.get_nowait()
         if user_input.strip().lower() == "/stop":
             stop_signal.set()
-            print("Stop command received. Shutting down...")
+            print("\nStop command received. Shutting down...")
             return True
     except queue.Empty:
         pass

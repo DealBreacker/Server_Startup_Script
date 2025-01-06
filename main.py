@@ -5,20 +5,23 @@ import threading
 import os
 from datetime import datetime
 from server_configs import last_activity, players_online, SERVER_CONFIGS
-from server_management import socket_servers, handle_connection, stop_server, setup_server_sockets
+from server_management import socket_servers, handle_connection, stop_server, setup_server_sockets, handle_connection_test
 from tmux_manager import kill_tmux_sessions
 from logging_system import initialize_log_files, log_connection, generate_daily_summary, save_state, load_state, rollover_server_logs, rollover_summary_logs
 from shutdown_manager import stop_signal, check_for_stop, stop_all_servers, close_all_threads, log_shutdown_event, input_listener
 
-DEBUG_MODE = 0  # Set to 1 for debugging (only print information), 0 for normal operation
+DEBUG_MODE = 0  # Set to 0 for normal operation, 1 for debug prints, 2 for connection listening only
 
 def main():
     # Ensure log directories exist
     os.makedirs("summary_logs", exist_ok=True)
     os.makedirs("server_logs", exist_ok=True)
 
-    if DEBUG_MODE:
-        print("Debug Mode Active: No servers will be started.")
+    if DEBUG_MODE == 1:
+        print("Debug Mode 1 Active: No servers will be started, only debug information will be printed.")
+    elif DEBUG_MODE == 2:
+        print("Debug Mode 2 Active: Listening for connections and printing received data.")
+        setup_server_sockets()  # We need to set up sockets to listen for connections
     else:
         kill_tmux_sessions()  # Ensuring tmux sessions are killed before starting the servers
         setup_server_sockets()  # Initializing the server sockets
@@ -35,7 +38,7 @@ def main():
     input_thread = threading.Thread(target=input_listener, daemon=True)
     input_thread.start()
 
-    print("Type '/stop' and press Enter at any time to stop the program.")
+    print("\nType '/stop' and press Enter at any time to stop the program.")
 
     last_day = datetime.now().day
     last_save = time.time()
@@ -50,10 +53,10 @@ def main():
         loop_count += 1
         current_time = datetime.now()
 
-        if time.time() - last_print >= print_interval:
+        if DEBUG_MODE < 2 and time.time() - last_print >= print_interval:
             print(f"Current time is {current_time.strftime('%Y/%m/%d %H:%M:%S')}")
             for server_name, last_time in last_activity.items():
-                if DEBUG_MODE:
+                if DEBUG_MODE == 1:
                     print(f"Checking activity for {server_name}: Last activity at {datetime.fromtimestamp(last_time).strftime('%Y/%m/%d %H:%M:%S')}")
             last_print = time.time()
         
@@ -72,7 +75,11 @@ def main():
         for server_name, info in socket_servers.items():
             server_socket = info['server_socket']
             try:
-                if not DEBUG_MODE:
+                if DEBUG_MODE == 2:
+                    client_socket, addr = server_socket.accept()
+                    handle_connection_test(server_name, client_socket, addr)
+                    client_socket.close()
+                elif DEBUG_MODE == 0:
                     client_socket, addr = server_socket.accept()
                     client_socket.settimeout(2)
                     handle_connection(server_name, client_socket, addr)
@@ -81,13 +88,13 @@ def main():
             except socket.error:
                 pass
 
-            # Check activity every 0.1 seconds, but only act on it
-            if not DEBUG_MODE and socket_servers[server_name]['running'] and time.time() - last_activity[server_name] > 1800 and not players_online[server_name]:
+            # Check activity every 0.1 seconds, but only act on it in normal mode
+            if DEBUG_MODE == 0 and socket_servers[server_name]['running'] and time.time() - last_activity[server_name] > 1800 and not players_online[server_name]:
                 stop_server(server_name)
 
         time.sleep(0.1)  # Sleep for 1/10 of a second
 
-    print("Stop signal received. Initiating shutdown...")
+    print("\nStop signal received. Initiating shutdown...")
     stop_all_servers(socket_servers, stop_server)
     close_all_threads()
     log_shutdown_event()
