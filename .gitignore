@@ -37,5 +37,5 @@
 # Ignore certain directories
 server_logs/
 summary_logs/
-__pyache__/
 server_state.json
+__pycache__/
