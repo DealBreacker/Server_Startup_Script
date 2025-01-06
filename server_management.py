@@ -38,8 +38,12 @@ def handle_connection_test(server_name, client_socket, addr):
                 b'\x00M\x00C\x00|\x00P\x00i\x00n\x00g\x00H\x00o\x00s\x00t' in data or
                 (data[0] in [0x1a, 0x1e, 0x21, 0x24] and b'\xff\x05' in data[:5])):
                 print(f"{addr} is pinging the server {server_name}.")
-            else:
+            elif (data[0] in [0x1a, 0x1b, 0x1f, 0x21, 0x22, 0x24, 0x25] and 
+                    b'\xff\x05' in data[:5] and
+                    b'dealbreacker.com.de' in data):
                 print(f"{addr} is attempting to connect to the server {server_name}.")
+            else:
+                print(f"Unknown signal to {server_name} from {addr}")
         else:
             print(f"No data received from {addr}.")
     except socket.error as e:
@@ -62,7 +66,10 @@ def handle_connection(server_name, client_socket, addr):
                 (len(data) < 50 and data[0] in [0x1a, 0x1e, 0x21, 0x24] and b'\xff\x05' in data[:5])):
                 print(f"{addr} is pinging the server {server_name}")
                 return
-            else:
+            # New condition for connection attempts
+            elif (data[0] in [0x1a, 0x1b, 0x1f, 0x21, 0x22, 0x24, 0x25] and 
+                    b'\xff\x05' in data[:5] and
+                    b'dealbreacker.com.de' in data):
                 print(f"{addr} is attempting to connect to {server_name}")
                 # Start server logic here
                 server_info = socket_servers[server_name]
@@ -92,12 +99,15 @@ def handle_connection(server_name, client_socket, addr):
                     threading.Thread(target=follow_log, args=(server_name, log_file), daemon=True).start()
                 else:
                     print(f"Log file {log_file} not found for {server_name}. Monitoring not started.")
+            else:
+                print(f"Unknown signal to {server_name} from {addr}")
         else:
             print(f"No data received from {addr}")
     except Exception as error:
         print(f"Error handling connection for {server_name}: {error}")
     finally:
         client_socket.close()
+
 
 
 def stop_server(server_name):
@@ -115,3 +125,5 @@ def stop_server(server_name):
     socket_servers[server_name]['server_socket'].listen(5) 
     socket_servers[server_name]['server_socket'].setblocking(0)
     last_activity[server_name] = time.time()
+
+
