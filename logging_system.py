@@ -51,7 +51,7 @@ def update_player_log(server_name, player_name, action, duration=None):
                 elif action == 'leave':
                     last_join = datetime.strptime(parts[1], '%Y-%m-%d %H:%M:%S')
                     session_duration = datetime.now() - last_join
-                    total_time = timedelta(seconds=int(parts[2])) + session_duration
+                    total_time = timedelta(seconds=float(parts[2])) + session_duration
                     parts[2] = str(total_time.total_seconds())
                 f.write(','.join(parts) + '\n')
                 player_found = True

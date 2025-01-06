@@ -90,7 +90,6 @@ def handle_connection(server_name, client_socket, addr):
                 print(f"Log file location is {log_file}")
                 if os.path.exists(log_file):
                     threading.Thread(target=follow_log, args=(server_name, log_file), daemon=True).start()
-                    print(f"Log file {log_file} is currently being tracked for {server_name}, monitoring started")
                 else:
                     print(f"Log file {log_file} not found for {server_name}. Monitoring not started.")
         else:
