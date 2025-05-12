@@ -15,13 +15,6 @@ SERVER_CONFIGS = {
         'startup_program': './start.sh',
 	'log_file': '/home/dealbreacker/servers/bros_server_1.21.2/logs/latest.log'
     },
-    'personal_server': {
-        'host': '192.168.1.130',
-        'port': 25568,
-        'startup_script': '/home/dealbreacker/servers/bros_server_1.21.2/',
-        'startup_program': './start.sh',
-	'log_file': '/home/dealbreacker/servers/bros_server_1.21.2/logs/latest.log'
-    }
 }
 #~~~~~~~~~~~~~~ This is the location for servers that are currently under maintinance/out of comission~~~~~~~~~
 #    'Creative_Server': {
